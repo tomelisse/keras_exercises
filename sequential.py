@@ -1,7 +1,10 @@
+''' mnist for begginers '''
+''' https://gist.github.com/saitodev/8532cf9e94a9490f75a9bce678751aec '''
 from keras.models import Sequential
 from keras.callbacks import Callback
 from keras.layers import Dense
 from matplotlib import pyplot as plt
+import dataset
 import numpy as np
 import h5py
 
@@ -21,29 +24,18 @@ def main():
     print model.predict(x_pred)
 
 
-def prepare_dataset():
-    ''' convert the original dara to .storage file '''
-    from tensorflow.examples.tutorials.mnist import input_data
-    mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)  
-    with h5py.File('data/mnist.storage', 'w') as f:
-        train = f.create_group('train')
-        train.create_dataset('images', data = mnist.train.images)
-        train.create_dataset('labels', data = mnist.train.labels)
-       
-        test = f.create_group('test')
-        test.create_dataset('images', data = mnist.test.images)
-        test.create_dataset('labels', data = mnist.test.labels)
-
 class LossHistory(Callback):
     ''' custom callback for recording losses for each batch '''
     def on_train_begin(self, logs = {}):
         self.losses = []
 
     def on_batch_end(self, batch, logs = {}):
-        self.losses.append(logs.get('loss'))
+        self.losses.append(logs['loss'])
+        # self.losses.append(logs.get('loss'))
 
 def mnist():
-    # prepare_dataset()
+    # try functional API
+    # dataset.prepare_dataset()
     with h5py.File('data/mnist.storage') as f:
         x_train = f['train/images'][:]
         y_train = f['train/labels'][:]
